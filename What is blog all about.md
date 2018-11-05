@@ -6,7 +6,8 @@
     
     Tunable consistency is where clients have the flexibility to adjust the consistency levels as per their needs, ranging from strong to eventual consistency. Cassandra supports a per-operation tradeoff between consistency and availability through 'Consistency Levels'. Basically, an operation’s consistency level specifies how many of the replicas need to respond to the coordinator node in order to consider the operation a success.
 
-    In this blog post, I will explain Cassandra’s consistency levels, light weight transactions (LWT) which provide serial consistency and vector clocks along with Jepsen analysis of Cassandra. </p>
+    In this blog post, I will explain Cassandra’s consistency levels, light weight transactions (LWT) which provide serial consistency and vector clocks along with Jepsen analysis of Cassandra. 
+</p>
 
 
 
