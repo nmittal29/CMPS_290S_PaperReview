@@ -10,7 +10,7 @@
 </p>
 
 <p align="justify" markdown="1">
-    In this blog post, I will explain Cassandra’s consistency levels, light weight transactions (LWT) which provide serial consistency and vector clocks along with Jepsen analysis of Cassandra. 
+    In this blog post, I will explain Cassandra’s consistency levels, light weight transactions (LWT) which provide serial consistency, vector clocks and distributed concurrency bugs in Cassandra along with Jepsen analysis.
 </p>
 
 
