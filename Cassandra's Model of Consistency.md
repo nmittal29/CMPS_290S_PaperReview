@@ -66,3 +66,7 @@ The coordinator node sends one replica node with a direct read request and a dig
 <p align="center">
   <img src="case5_read.png" alt="Read Example 5" width="400px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
+
+<p align="center">
+  <img src="table1.png" alt="Read_Table" width="500px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
