@@ -81,7 +81,7 @@ The coordinator sends a write request to all replicas that own the row being w
   <img src="write_case_multiple.png" alt="Read_Table" width="400px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
 <p align="center">
-  <img src="table2_write.png" alt="Write_Table" width="800px;" height="200px;" style="background:none; border:none; box-shadow:none;"/>
+  <img src="table2_write.png" alt="Write_Table" width="800px;" height="300px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
 <p align="center">Table 2: Write Consistency Levels</p>
 
