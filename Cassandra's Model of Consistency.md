@@ -52,17 +52,17 @@ The coordinator node sends one replica node with a direct read request and a dig
 </p>
 2. A single data center cluster with a consistency level of ONE
 <p align="center">
-  <img src="case2_readcase.png" alt="Read Example 2" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+  <img src="case2_read.png" alt="Read Example 2" width="400px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
 3. A two data center cluster with a consistency level of QUORUM
 <p align="center">
-  <img src="case3_readcase.png" alt="Read Example 3" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+  <img src="case3_read.png" alt="Read Example 3" width="400px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
 4. A two data center cluster with a consistency level of LOCAL_QUORUM
 <p align="center">
-  <img src="case4_readcase.png" alt="Read Example 4" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+  <img src="case4_read.png" alt="Read Example 4" width="400px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
 5. A two data center cluster with a consistency level of LOCAL_ONE 
 <p align="center">
-  <img src="case5_readcase.png" alt="Read Example 5" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+  <img src="case5_read.png" alt="Read Example 5" width="400px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
