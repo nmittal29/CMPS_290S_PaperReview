@@ -68,5 +68,6 @@ The coordinator node sends one replica node with a direct read request and a dig
 </p>
 
 <p align="center">
-  <img src="table1_read.png" alt="Read_Table" width="500px;" style="background:none; border:none; box-shadow:none;"/>
+  <img src="table1_read.png" alt="Read_Table" width="800px;" height="300px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
+<p align="center">Table1: Read Consistency Levels</p>
