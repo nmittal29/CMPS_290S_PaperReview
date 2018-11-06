@@ -40,7 +40,6 @@ Cassandra can send three types of read requests to a replica:
 2. digest request
 3. background read repair request
 
-
 <p align="justify">
 The coordinator node sends one replica node with a direct read request and a digest request to a number of replicas determined by the consistency level specified by the client. These contacted nodes return the requested data and the coordinator compare the rows from each replica to ensure consistency. If all replicas are not in sync, the coordinator uses the replica that has the most recent data (based on timestamp) to forward the result back to the client. Meanwhile, a background read repair request is sent to out-of-date replicas to ensure that the requested data is made consistent on all replicas.
 </p>
@@ -48,3 +47,22 @@ The coordinator node sends one replica node with a direct read request and a dig
 #### Examples of Read Consistency Levels
 
 1. A single data center cluster with a consistency level of QUORUM 
+<p align="center">
+  <img src="case1_readcase.png" alt="Read Example 1" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
+2. A single data center cluster with a consistency level of ONE
+<p align="center">
+  <img src="case2_readcase.png" alt="Read Example 2" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
+3. A two data center cluster with a consistency level of QUORUM
+<p align="center">
+  <img src="case3_readcase.png" alt="Read Example 3" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
+4. A two data center cluster with a consistency level of LOCAL_QUORUM
+<p align="center">
+  <img src="case4_readcase.png" alt="Read Example 4" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
+5. A two data center cluster with a consistency level of LOCAL_ONE 
+<p align="center">
+  <img src="case5_readcase.png" alt="Read Example 5" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
