@@ -70,4 +70,14 @@ The coordinator node sends one replica node with a direct read request and a dig
 <p align="center">
   <img src="table1_read.png" alt="Read_Table" width="800px;" height="200px;" style="background:none; border:none; box-shadow:none;"/>
 </p>
-<p align="center">Table1: Read Consistency Levels</p>
+<p align="center">Table 1: Read Consistency Levels</p>
+
+### Write Request in Cassandra
+
+<p align="justify">
+The coordinator sends a write request to all replicas that own the row being written. As long as all replica nodes are available, they will get the write request regardless of the consistency level specified by the client. The write consistency level determines how many replica nodes must respond with a success acknowledgment in order for the write to be considered successful.
+</p>
+<p align="center">
+  <img src="write_case_multiple.png" alt="Read_Table" width="400px;" style="background:none; border:none; box-shadow:none;"/>
+</p>
+
