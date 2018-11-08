@@ -10,5 +10,5 @@ Cassandra Query Language (CQL) provides IF syntax to deal with such cases:
 ~~~~
 INSERT INTO account (transaction_date, customer_id, amount) 
 VALUES (2016-11-02, 356, 125.00) 
-IF NOT EXISTS;`
+**IF NOT EXISTS;**
 ~~~~
