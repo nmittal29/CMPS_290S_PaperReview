@@ -10,12 +10,16 @@ Cassandra Query Language (CQL) provides IF syntax to deal with such cases:
 ~~~~
 INSERT INTO account (transaction_date, customer_id, amount) 
 VALUES (2016-11-02, 356, 125.00) 
-__IF NOT EXISTS__
+IF NOT EXISTS
 ~~~~
 
 ~~~~
 UPDATE account SET amount = 230.00 
 WHERE payment_date = 2016-11-02
-AND customer_id = 123 
-__IF__ amount = 125.00
+AND customer_id = 356 
+IF amount = 125.00
 ~~~~
+
+<p align="justify">
+To synchronize replicas for LWTs, Cassandra uses Paxos protocol for consensus. There are four phases to Paxos:prepare/promise, read/results, propose/accept and commit/ack. Thus, Cassandra makes four round trips between a node proposing a lightweight transaction and any needed replicas in the cluster to ensure proper execution, so performance is affected. 
+</p>
