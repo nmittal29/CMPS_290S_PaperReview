@@ -31,3 +31,9 @@ for (i=0; i < num_elements; i++)
 To determine if two events are concurrent, do an element-by-element comparison of the corresponding timestamps. If each element of timestamp V is less than or equal to the corresponding element of timestamp W then V causally precedes W and the events are not concurrent. If each element of timestamp V is greater than or equal to the corresponding element of timestamp W then W causally precedes V and the events are not concurrent. If, on the other hand, neither of those conditions apply and some elements in V are greater than while others are less than the corresponding element in W then the events are concurrent.
 </p>
 
+<p align="center">
+<img src="vector_clock_final.gif" width="400px;"></img>
+Example of how vector clock works
+</p>
+
+	
