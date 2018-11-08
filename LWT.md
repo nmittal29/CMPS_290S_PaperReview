@@ -23,5 +23,7 @@ IF amount = 125.00
 <p align="justify">
 To synchronize replicas for LWTs, Cassandra uses Paxos protocol for consensus. There are four phases to Paxos: <b>prepare/promise</b>, <b>read/results</b>, <b>propose/accept</b> and <b>commit/ack</b>. Thus, Cassandra makes four round trips between a node proposing a lightweight transaction and any needed replicas in the cluster to ensure proper execution, so performance is affected. 
 </p>
-
+<p align="center">
+<img src="lwt.png"></img>
+</p>
 
