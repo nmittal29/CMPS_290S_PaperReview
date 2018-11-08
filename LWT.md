@@ -41,3 +41,23 @@ Conceptually, if a leader interrupts an earlier leader, it must first finish tha
 After the commit phase, the value written by LWT is visible to non-LWTs.
 </p>
 
+~~~~
+Parsing insert into users (username, password, email ) values ( ‘mick’, ’mick’, ’mick@gmail.com' ) if
+not exists; [SharedPool-Worker-1] | 2016-08-22 12:38:44.132000 | 127.0.0.1 | 1125
+Sending PAXOS_PREPARE message to /127.0.0.3 [MessagingService-Outgoing-/127.0.0.3] | 2016-08-22 12:38:44.141000
+| 127.0.0.1 | 10414
+Sending PAXOS_PREPARE message to /127.0.0.2 [MessagingService-Outgoing-/127.0.0.2] | 2016-08-22 12:38:44.142000
+| 127.0.0.1 | 10908
+Promising ballot fb282190-685c-11e6-71a2-e0d2d098d5d6 [SharedPool-Worker-1] | 2016-08-22 12:38:44.147000 |
+127.0.0.3 | 4325
+Promising ballot fb282190-685c-11e6-71a2-e0d2d098d5d6 [SharedPool-Worker-1] | 2016-08-22 12:38:44.147000 |
+127.0.0.3 | 4325
+Promising ballot fb282190-685c-11e6-71a2-e0d2d098d5d6 [SharedPool-Worker-3] | 2016-08-22 12:38:44.166000 |
+127.0.0.1 | 35282
+Accepting proposal Commit(fb282190-685c-11e6-71a2-e0d2d098d5d6, [lwts.users] key=mick columns=[[] | [email
+password]]\n Row: EMPTY | email=mick@gmail.com, password=mick) [SharedPool-Worker-2] |
+2016-08-22 12:38:44.199000 | 127.0.0.1 | 67804
+~~~~
+
+<p align="center"> Paxos trace in Cassandra </p>
+
