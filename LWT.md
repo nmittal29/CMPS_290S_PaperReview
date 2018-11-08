@@ -63,8 +63,8 @@ password]]\n Row: EMPTY | email=mick@gmail.com, password=mick) [SharedPool-Worke
 There are two consistency levels associated with LWTs:
 </p>
 
-1.	SERIAL : where paxos consensus protocol will involve all the nodes across multiple datacenters.
-2.	LOCAL_SERIAL : where paxos consensus protocol will run on local datacenter.
+1.	<b>SERIAL</b> : where paxos consensus protocol will involve all the nodes across multiple datacenters.
+2.	<b>LOCAL_SERIAL</b> : where paxos consensus protocol will run on local datacenter.
 
 <p align="justify">
 Serial reads allows reading the current (and possibly uncommitted) data. If a SERIAL read finds an uncommitted LWT in progress, Cassandra performs a read repair as part of the commit.
