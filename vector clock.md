@@ -32,8 +32,9 @@ To determine if two events are concurrent, do an element-by-element comparison o
 </p>
 
 <p align="center">
-<img src="vector_clock_final.gif" width="400px;"></img>
+<img src="vector_clock_final.gif"></img>
+</p>
+<p align="center">
 Example of how vector clock works
 </p>
-
 	
