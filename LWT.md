@@ -23,7 +23,21 @@ IF amount = 125.00
 <p align="justify">
 To synchronize replicas for LWTs, Cassandra uses Paxos protocol for consensus. There are four phases to Paxos: <b>prepare/promise</b>, <b>read/results</b>, <b>propose/accept</b> and <b>commit/ack</b>. Thus, Cassandra makes four round trips between a node proposing a lightweight transaction and any needed replicas in the cluster to ensure proper execution, so performance is affected. 
 </p>
+
 <p align="center">
 <img src="lwt.png"></img>
+</p>
+
+<p align="justify">
+Prepare/promise is the core of the algorithm. The leader (node which proposes the value) picks a proposal number and sends it to the participating replicas. If the proposal number is the highest a replica has seen, it promises to not accept any proposals associated with any earlier proposal number. Along with that promise, it includes the most recent proposal it has already received.
+</p>
+
+<p align="justify">
+If a majority of the nodes promise to accept the leader's proposal, it may proceed to the actual proposal, but with the wrinkle that if a majority of replicas included an earlier proposal with their promise, then that is the value the leader must propose.
+</p>
+
+<p align="justify">
+Conceptually, if a leader interrupts an earlier leader, it must first finish that leader's proposal before proceeding with its own, thus giving the desired linearizable behavior.
+After the commit phase, the value written by LWT is visible to non-LWTs.
 </p>
 
