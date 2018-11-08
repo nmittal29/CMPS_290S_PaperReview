@@ -38,7 +38,7 @@ If a majority of the nodes promise to accept the leader's proposal, it may proce
 
 <p align="justify">
 Conceptually, if a leader interrupts an earlier leader, it must first finish that leader's proposal before proceeding with its own, thus giving the desired linearizable behavior.
-After the commit phase, the value written by LWT is visible to non-LWTs.
+After the commit phase, the value written by LWT is visible to non-LWTs. Following is an exmaple of paxos trace in Cassandra: 
 </p>
 
 ~~~~
@@ -59,5 +59,4 @@ password]]\n Row: EMPTY | email=mick@gmail.com, password=mick) [SharedPool-Worke
 2016-08-22 12:38:44.199000 | 127.0.0.1 | 67804
 ~~~~
 
-<p align="center"> Paxos trace in Cassandra </p>
 
