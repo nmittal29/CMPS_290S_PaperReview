@@ -74,3 +74,63 @@ It turns out that Cassandra is taking the current time in milliseconds and tac
 Another example of this is during a read query, a coordinator node collects and compares digests (hash) of the data from replicas. If the digests mismatch, conflicts in the values are resolved using a latest timestamp wins policy. If there is a tie between timestamps, the lexically greatest value is chosen and installed on other replicas. If the corrupted value is lexically greater than the original value, the corrupted value is returned to the user and the corruption is propagated to other intact replicas. 
 </p>
 
+#### LWTs
+
+Code snippet from lwt.clj:
+
+~~~~
+(defrecord LwwCasRegisterClient [conn]
+  client/Client
+  (setup! [_ test node]
+    (locking setup-lock
+      (let [conn (cassandra/connect (->> test :nodes (map name)))]
+        (cql/create-keyspace conn "jepsen_keyspace"
+                             (if-not-exists)
+                             (with {:replication
+                                    {:class "SimpleStrategy"
+                                     :replication_factor 3}}))
+        (cql/use-keyspace conn "jepsen_keyspace")
+        (cql/create-table conn "lww_cas"
+                          (if-not-exists)
+                          (column-definitions {:id :int
+                                               :value :int
+                                               :primary-key [:id]}))
+~~~~
+
+<p align="justify">
+A table 'lww_cas' is created where each row comprising of id(primary key) and value with a replication factor of 3 in a cluster of five nodes.
+</p>
+
+~~~~
+(defn lww-cas-register-client
+  "A CAS register implemented using LWW client-side CAS"
+  []
+  (->LwwCasRegisterClient nil))
+
+(defn lww-cas-register-test
+  [name opts]
+  (merge (cassandra-test (str "lww cas register " name)
+                         {:client (lww-cas-register-client)
+                          :model (model/cas-register)
+                          :generator (gen/phases
+                                      (->> [r w cas cas cas]
+                                           gen/mix
+                                           (gen/stagger 1/10)
+                                           (gen/delay 1)
+                                           (gen/nemesis
+                                            (gen/seq (cycle
+                                                      [(gen/sleep 5)
+                                                       {:type :info :f :stop}
+                                                       (gen/sleep 15)
+                                                       {:type :info :f :start}
+                                                       ])))
+                                           (gen/time-limit 50))
+                                      gen/void)
+                          :checker (checker/compose
+                                    {:linear checker/linearizable})})
+         opts))
+~~~~
+
+<p align="justify">
+In the generator phases, various tests are run by mixing read/write operations with explicit delays, staggering, timeouts and disrupting/crashing a node. Numerous issues populated which challenged Cassandra's claim to offer linearizability via LWTs. 
+</p>
