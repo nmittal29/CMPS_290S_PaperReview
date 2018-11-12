@@ -154,11 +154,11 @@ IF amount = 125.00
 ~~~~
 
 <p align="justify">
-To synchronize replicas for LWTs, Cassandra uses Paxos protocol for consensus. There are four phases to Paxos: <b>prepare/promise</b>, <b>read/results</b>, <b>propose/accept</b> and <b>commit/ack</b>. Thus, Cassandra makes four round trips between a node proposing a lightweight transaction and any needed replicas in the cluster to ensure proper execution, so performance is affected. 
+To synchronize replica nodes for LWT, Cassandra uses Paxos consensus protocol. There are four phases in Paxos: <b>prepare/promise</b>, <b>read/results</b>, <b>propose/accept</b> and <b>commit/ack</b>. Thus, Cassandra makes four network round trips between a node proposing a lightweight transaction(leader node) and other replicas in the cluster to ensure linearizable execution, so performance is affected. 
 </p>
 
 <p align="justify">
-Prepare/promise is the core of the algorithm. The leader (node which proposes the value) picks a proposal number and sends it to the participating replicas. If the proposal number is the highest a replica has seen, it promises to not accept any proposals associated with any earlier proposal number. Along with that promise, it includes the most recent proposal it has already received.
+Prepare/promise is the critical phase of the Paxos algorithm. The leader (node which proposes the value) picks a proposal number and sends it to the participating replicas. If the proposal number is the highest a replica has seen, it promises to not accept any proposals associated with any earlier proposal number. Along with that promise, it includes the most recent proposal it has already received.
 </p>
 
 <p align="justify">
@@ -166,8 +166,7 @@ If a majority of the nodes promise to accept the leader's proposal, it may proce
 </p>
 
 <p align="justify">
-Conceptually, if a leader interrupts an earlier leader, it must first finish that leader's proposal before proceeding with its own, thus giving the desired linearizable behavior.
-After the commit phase, the value written by LWT is visible to non-LWTs. Following is an exmaple of paxos trace in Cassandra: 
+Conceptually, if a leader interrupts an earlier leader, it must first finish that leader's proposal before proceeding with its own, thus giving the desired linearizable behavior. After the commit phase, the value written by LWT is visible to non-LWTs. Following is an exmaple of paxos trace in Cassandra: 
 </p>
 
 ~~~~
@@ -196,13 +195,13 @@ There are two consistency levels associated with LWTs:
 2.	<b>LOCAL_SERIAL</b> : where paxos consensus protocol will run on local datacenter.
 
 <p align="justify">
-Serial reads allows reading the current (and possibly uncommitted) data. If a SERIAL read finds an uncommitted LWT in progress, Cassandra performs a read repair as part of the commit.
+SERIAL reads allows reading the current (and possibly uncommitted) data. If a SERIAL read finds an uncommitted LWT in progress, Cassandra performs a read repair as part of the SERIAL read.
 </p>
 
 ## Vector Clocks
 
 <p align="justify">
-Vector Clocks are used to determine whether pairs of events are causally related in in distributed systems. Timestamps are generated for each event in the system, and their causal relationship is determined by comparing those timestamps.
+Vector Clocks are used to determine whether pairs of events are causally related in a distributed system. Timestamps are generated for each event in the system, and their causal relationship is determined by comparing those timestamps.
 The timestamp for an event is vector of numbers, with each number corresponding to a process. Each process knows its position in the vector.
 </p>
 
