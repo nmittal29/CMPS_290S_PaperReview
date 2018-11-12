@@ -27,4 +27,12 @@ Jepsen test has three key properties:
 
 ### How a test runs?
 
+<p justify="center">
+<img src="lein_test1.png" width="400px;" />
+</p>
+
+1.	Orchestration node has one thread for each client and a thread for nemesis conductor
+2.	A series of generated data comprising of read/write operations for client threads and crash/corrupt/partition operations for nemesis thread.
+3.	N nodes on which Cassandra cluster is running.
+
 
