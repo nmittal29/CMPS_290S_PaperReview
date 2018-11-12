@@ -59,8 +59,14 @@ Cassandra can send three types of read requests to a replica:
 <p align="justify">
 The coordinator node sends one replica node with a direct read request and a digest request to a number of replicas determined by the consistency level specified by the client. These contacted nodes return the requested data and the coordinator compares the rows from each replica to ensure consistency. If all replicas are not in sync, the coordinator uses the replica that has the most recent data (based on timestamp) to forward the result back to the client. Meanwhile, a background read repair request is sent to out-of-date replicas to ensure that the requested data is made consistent on all replicas.
 </p>
-
-<table align="center">
+<style type="text/css">
+    table.center {
+    width:70%; 
+    margin-left:15%; 
+    margin-right:15%;
+  }
+</style>
+<table class="center">
     <thead>
         <tr>
             <th align="left">Consistency Level </th>
