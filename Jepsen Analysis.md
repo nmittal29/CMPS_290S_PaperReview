@@ -27,12 +27,21 @@ Jepsen test has three key properties:
 
 ### How a test runs?
 
-<p justify="center">
-<img src="lein_test1.png" width="400px;" />
+<p align="center">
+<img src="lein_test1.png" width="500px;" />
 </p>
 
 1.	Orchestration node has one thread for each client and a thread for nemesis conductor
 2.	A series of generated data comprising of read/write operations for client threads and crash/corrupt/partition operations for nemesis thread.
 3.	N nodes on which Cassandra cluster is running.
+
+<p align="center">
+<img src="lein_test2.png" width="500px;" />
+</p>
+
+4. A concurrent recorded history that explains the chronological behavior of the test. 
+5.	Operations in the history are expressed as windows which marks the beginning and ending.
+6.	After running the tests, the attached checker is executed, which produces judgement on the validity of the test or produces some artifacts to explain the result of the tests.
+
 
 
