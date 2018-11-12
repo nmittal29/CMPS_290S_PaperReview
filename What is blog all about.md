@@ -60,7 +60,6 @@ Cassandra can send three types of read requests to a replica:
 The coordinator node sends one replica node with a direct read request and a digest request to a number of replicas determined by the consistency level specified by the client. These contacted nodes return the requested data and the coordinator compares the rows from each replica to ensure consistency. If all replicas are not in sync, the coordinator uses the replica that has the most recent data (based on timestamp) to forward the result back to the client. Meanwhile, a background read repair request is sent to out-of-date replicas to ensure that the requested data is made consistent on all replicas.
 </p>
 
-<p align="left">Table 1: Read Consistency Levels</p>
 <table style="margin-left:20px;margin-right:20px;" border-spacing='0'>
     <thead>
         <tr>
@@ -87,6 +86,7 @@ The coordinator node sends one replica node with a direct read request and a dig
         </tr>
     </tbody>
 </table>
+<p align="left">Table 1: Read Consistency Levels</p>
 
 ### Write Request in Cassandra
 
@@ -94,10 +94,42 @@ The coordinator node sends one replica node with a direct read request and a dig
 The coordinator node sends a write request to all the replicas that contain the row being written. As long as all replicas are available, they will get the write request regardless of the write consistency level specified by the client. The write consistency level determines how many replicas should respond with an acknowledgment in order for the write to be considered successful.
 </p>
 
-<p align="center">
-  <img src="table2_write.png" alt="Write_Table" width="800px;" height="300px;" style="background:none; border:none; box-shadow:none;"/>
-</p>
-<p align="center">Table 2: Write Consistency Levels</p>
+<table style="margin-left:20px;margin-right:20px;" border-spacing='0'>
+    <thead>
+        <tr>
+            <th align="left">Consistency Level </th>
+            <th align="left">Usage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="left">ALL</td>
+            <td align="left">highest consistency and lowest availability</td>
+        </tr>
+        <tr>
+            <td align="left">EACH_QUORUM</td>
+            <td align="left">strong consistency but write fails when a datacenter is down</td>
+        </tr>
+        <tr>
+            <td align="left">QUORUM</td>
+            <td align="left">strong consistency with some level of failure</td>
+        </tr>
+        <tr>
+            <td align="left">LOCAL_QUORUM</td>
+            <td align="left">strong consistency which avoids inter-datacenter communication latency</td>
+        </tr>
+        <tr>
+            <td align="left">ONE</td>
+            <td align="left">low consistency and high availability</td>
+        </tr>
+        <tr>
+            <td align="left">ANY</td>
+            <td align="left">lowest consistency and highest availability and guarantees that write will never fail</td>
+        </tr>
+    </tbody>
+</table>
+
+<p align="left">Table 2: Write Consistency Levels</p>
 
 
 
