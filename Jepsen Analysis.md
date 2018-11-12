@@ -25,3 +25,6 @@ Jepsen test has three key properties:
  :checker              ...}  | looks at and assesses the test run
 ~~~~
 
+### How a test runs?
+
+
