@@ -132,5 +132,10 @@ A table 'lww_cas' is created where each row comprising of id(primary key) and va
 ~~~~
 
 <p align="justify">
-In the generator phases, various tests are run by mixing read/write operations with explicit delays, staggering, timeouts and disrupting/crashing a node. Numerous issues populated which challenged Cassandra's claim to offer linearizability via LWTs. 
+In the generator phases, various tests are run by mixing read/write operations with explicit delays, staggering, timeouts and disrupting/crashing a node. Numerous issues populated which challenged Cassandra's claim to offer linearizability via LWTs:
 </p>
+
+1.
+2.
+3.
+
