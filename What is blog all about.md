@@ -61,12 +61,14 @@ The coordinator node sends one replica node with a direct read request and a dig
 </p>
 
 <center>
+    
 | Consistency Level             | Usage                                                                       |
 |------------------------------ |-----------------------------------------------------------------------------|
 | ALL                           | highest consistency and lowest availability                                 |
 | QUORUM                        | strong consistency with some level of failure                               |
 | LOCAL_QUORUM                  | strong consistency which avoids inter-datacenter communication latency      |
-| ONE                           | lowest consistency and highest availability
+| ONE                           | lowest consistency and highest availability                                 |
+
 </center>
 <p align="center">Table 1: Read Consistency Levels</p>
 
