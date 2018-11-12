@@ -72,6 +72,12 @@ The coordinator node sends one replica node with a direct read request and a dig
 </p>
 <p align="center">Table 1: Read Consistency Levels</p>
 
+| Level        | Are            |
+| ------------- |:------------------------------------------------------:|
+| col 3 is      | right-aligned | 
+| col 2 is      | centered      |
+| zebra stripes | are neat      | 
+
 ### Write Request in Cassandra
 
 <p align="justify">
