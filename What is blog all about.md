@@ -329,8 +329,9 @@ Jepsen tests introduce clock drifts due to which system clocks are unsynchronize
 4. but w2 has lower timestamp than w1, Cassandra ignores w2 
 
 ~~~~
-A leap second is a one-second adjustment (due to irregularities in Earth’s rotation) that is occasionally applied UTC to keep it close to the solar time at Greenwich. 
-Linux Kernel systems handle leap second by taking a one-seconds backwards jump.
+A leap second is a one-second adjustment (due to irregularities in Earth’s rotation) that is occasionally applied UTC to 
+keep it close to the solar time at Greenwich. 
+Linux Kernel systems handle leap second by taking a one-second backwards jump.
 ~~~~
 
 <p align="justify">
@@ -392,10 +393,10 @@ A table 'lww_cas' is created where each row comprising of id(primary key) and va
 In the generator phases, various tests are run by mixing read/write operations with explicit delays, staggering, timeouts and disrupting/crashing a node. Numerous issues populated which challenged Cassandra's claim to offer linearizability via LWTs:
 </p>
 
-1.
-2.
-3.
+##### WriteTimeoutException when LWT concurrency level = QUORUM
+##### System Deadlock due to Incorrect implementation of Paxos
 
+## References
 
 
 
