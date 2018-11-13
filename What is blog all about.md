@@ -412,6 +412,7 @@ How can thread A know that it's update failed or succeeded? since between it doi
 <p align="justify">
 At this point thread A might assume it failed and try again and add another $100 to the balance, causing more money to appear in the account than would be expected.
 </p>
+
 ##### Incorrect implementation of Paxos
 <p align="justify">
 Paxos says that on receiving the result of a prepare from a quorum of acceptors, the proposer should propose the value of the higher-number proposal accepted amongst the ones returned by the acceptors, and only propose his own value if no acceptor has sent back a previously accepted value.
