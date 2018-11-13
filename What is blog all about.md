@@ -393,7 +393,7 @@ A table 'lww_cas' is created where each row comprising of id(primary key) and va
 In the generator phases, various tests are run by mixing read/write operations with explicit delays, staggering, timeouts and disrupting/crashing a node. Numerous issues populated which challenged Cassandra's claim to offer linearizability via LWTs:
 </p>
 
-##### WriteTimeoutException when LWT concurrency level = QUORUM
+#### WriteTimeoutException when LWT concurrency level = QUORUM
 <p align="justify">
 During high contention, the coordinator node loses track of whether the value it submitted to Paxos has been applied or not. For instance:
 </p>
@@ -413,7 +413,7 @@ How can thread A know that it's update failed or succeeded? since between it doi
 At this point thread A might assume it failed and try again and add another $100 to the balance, causing more money to appear in the account than would be expected.
 </p>
 
-##### Incorrect implementation of Paxos
+#### Incorrect implementation of Paxos
 <p align="justify">
 Paxos says that on receiving the result of a prepare from a quorum of acceptors, the proposer should propose the value of the higher-number proposal accepted amongst the ones returned by the acceptors, and only propose his own value if no acceptor has sent back a previously accepted value.
 </p>
