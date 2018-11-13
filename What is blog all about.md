@@ -299,10 +299,10 @@ That means that if the values written to two distinct columns don’t have the s
 </p>
 
 ~~~~
-10000 total
-9899 acknowledged
-9942 survivors
-58 acknowledged writes lost! 		//writes lost means corrupt data
+1000 total
+399 acknowledged
+397 survivors
+4 acknowledged writes lost! 		//writes lost means corrupt data
 ~~~~
 
 <p align="justify">
@@ -311,6 +311,30 @@ It turns out that Cassandra is taking the current time in milliseconds and tac
 
 <p align="justify">
 Another example of this is during a read query, a coordinator node collects and compares digests (hash) of the data from replicas. If the digests mismatch, conflicts in the values are resolved using a latest timestamp wins policy. If there is a tie between timestamps, the lexically greatest value is chosen and installed on other replicas. If the corrupted value is lexically greater than the original value, the corrupted value is returned to the user and the corruption is propagated to other intact replicas. 
+</p>
+
+#### Session Consistency
+
+<p align="justify">
+Cassandra is tightly bounded to wall-clock timestamps for ordering the writes. It makes several session guarantees (read-your writes), for example, if a client writes successfully to a quorum of nodes, any subsequent read will see that write or one with a higher timestamp.
+</p>
+
+<p align="justify">
+Jepsen tests introduce clock drifts due to which system clocks are unsynchronized and Cassandra no longer holds session consistency guarantees. For instance,
+</p>
+
+1. a client writes w1 prior to leap second and 
+2. same client then writes w2 just after the leap second
+3. session consistency expects subsequent read to see w2
+4. but w2 has lower timestamp than w1, Cassandra ignores w2 
+
+~~~~
+A leap second is a one-second adjustment (due to irregularities in Earth’s rotation) that is occasionally applied UTC to keep it close to the solar time at Greenwich. 
+Linux Kernel systems handle leap second by taking a one-seconds backwards jump.
+~~~~
+
+<p align="justify">
+Since system clocks are not monotonic, timestamps in Cassandra are fundamentally unsafe ordering constructs.
 </p>
 
 #### LWTs
@@ -341,11 +365,6 @@ A table 'lww_cas' is created where each row comprising of id(primary key) and va
 </p>
 
 ~~~~
-(defn lww-cas-register-client
-  "A CAS register implemented using LWW client-side CAS"
-  []
-  (->LwwCasRegisterClient nil))
-
 (defn lww-cas-register-test
   [name opts]
   (merge (cassandra-test (str "lww cas register " name)
@@ -367,7 +386,6 @@ A table 'lww_cas' is created where each row comprising of id(primary key) and va
                                       gen/void)
                           :checker (checker/compose
                                     {:linear checker/linearizable})})
-         opts))
 ~~~~
 
 <p align="justify">
