@@ -394,7 +394,31 @@ In the generator phases, various tests are run by mixing read/write operations w
 </p>
 
 ##### WriteTimeoutException when LWT concurrency level = QUORUM
-##### System Deadlock due to Incorrect implementation of Paxos
+<p align="justify">
+During high contention, the coordinator node loses track of whether the value it submitted to Paxos has been applied or not. For instance:
+</p>
+
+~~~~
+Thread A: Reads version 1
+Thread A: Transaction id=ABC, updates version 1 to 2 and sets account balance to $0+$100=$100, successfully applies the update but still receives a WTE.
+Thread B: Reads version 2
+Thread B: Transaction id=XYZ, updates version 2 to 3, and sets account balance to $100+500=$600, no WTE.
+Thread A: tries again, reads version 3 this time, sees that version 3 is greater than it's previous version 2, now it checks the transaction id and finds it's also different.
+~~~~
+
+<p align="justify">
+How can thread A know that it's update failed or succeeded? since between it doing the update and reading the record again, someone else has updated it.
+</p>
+<p align="justify">
+At this point thread A might assume it failed and try again and add another $100 to the balance, causing more money to appear in the account than would be expected.
+</p>
+##### Incorrect implementation of Paxos
+<p align="justify">
+Paxos says that on receiving the result of a prepare from a quorum of acceptors, the proposer should propose the value of the higher-number proposal accepted amongst the ones returned by the acceptors, and only propose his own value if no acceptor has sent back a previously accepted value.
+</p>
+<p align="justify">
+But the current implementation ignores the value already accepted by some acceptors if any of the acceptor sends a more recent ballot than the other acceptor but with no values. The net effect is that mistakenly the system is accepting two different values for the same round.
+</p>
 
 ## References
 
