@@ -25,12 +25,13 @@ COPL stands for "Concurrency Oriented Programming Languages", this term was coin
 
 As described in his [thesis](http://erlang.org/download/armstrong_thesis_2003.pdf), there are three major properties of Erlang which makes it satisfy the requirements for being considered a concurrent programming language. 
 These are:
-	1. It supports lightweight processes, as in the computation required to generate and destroy processes are very little.
-	2. It supports isolation of processes.
-	3. Every process is identified uniquely by a Pid.
-	4. There are no shared states between processes.
-	5. Message passing does not guarantee delivery, and is pure (no dangling pointers or data references).
-	6. Processes can detect the occurrence of and also the reason of failures in other processes.
+
+1. It supports lightweight processes, as in the computation required to generate and destroy processes are very little.
+2. It supports isolation of processes.
+3. Every process is identified uniquely by a Pid.
+4. There are no shared states between processes.
+5. Message passing does not guarantee delivery, and is pure (no dangling pointers or data references).
+6. Processes can detect the occurrence of and also the reason of failures in other processes.
 
 A critical requirement in COPLs is that of isolation. There must be strong isolation between the multiple processes running on a single machine. Unless programmed, no faults in any process should affect any of the other processes on the machine. To enable isolation, all processes have "share nothing" semantics and message passing between processes is asynchronous to prevent a sender of the message from getting indefinitely blocked in case software errors occur in the receiver. Data is also immutable within individual processes.
 
