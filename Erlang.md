@@ -72,3 +72,5 @@ By implementing supervisors in the OTP system in this manner, it is in effect im
 
 It is also important to exactly define what an error means for this system. Errors are not always corresponding to exceptions. [Joe](http://erlang.org/download/armstrong_thesis_2003.pdf) defines an error as "a deviation between the observed behavior of a system and the desired behavior of a system."
 
+## Programming Model
+
