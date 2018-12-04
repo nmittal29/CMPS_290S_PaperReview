@@ -63,9 +63,9 @@ A supervisor needs to have the information about how to start, stop or restart e
 An AND hierarchy is used where processes are intended to be coordinated with each other, whereas the OR hierarchy is used when processes are independent. 
 The supervisor acts according to the following rules:
 
-	1. If my parent stops me then I should stop all my children.
-	2. If any child dies and I am an AND supervisor stop all my children and restart all my children.
-	3. If any child dies and I am an OR supervisor restart the child that died.
+1. If my parent stops me then I should stop all my children.
+2. If any child dies and I am an AND supervisor stop all my children and restart all my children.
+3. If any child dies and I am an OR supervisor restart the child that died.
  
 By implementing supervisors in the OTP system in this manner, it is in effect implementing a supervision tree that can be used to monitor the behavior of the system.
 
