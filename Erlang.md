@@ -74,3 +74,152 @@ It is also important to exactly define what an error means for this system. Erro
 
 ## Programming Model
 
+### Concurrency
+In Erlang, *spawn(Fun)* is used to create a parallel process which executes function *Fun*. In the code, I have implemented a simple client-server model where a counter is incremented everytime when client sends a request to server.
+
+```
+-module(counter_client_server).
+-author("natashamittal").
+
+-export([start/0,counter_server/1,counter_client/1]).
+
+counter_server(Number) ->
+  receive
+    {request, Pid} ->
+      io:format("Server: ~w Client request received from: ~w~n",[self(),Pid]),
+      NewNumber = Number + 1,
+      Pid ! {hitCount, NewNumber},
+      counter_server(NewNumber)
+  end.
+
+counter_client(Server_Address) ->
+  Server_Address ! {request, self()},
+  receive
+    {hitCount, Number} ->
+      io:format("Client: ~w HitCount was: ~w~n",[self(),Number]),
+      if
+        (Number < 100) -> counter_client(Server_Address)
+      end
+  end.
+  
+start() ->
+  Server_PID = spawn(counter_client_server,counter_server,[0]),
+  spawn(counter_client_server,counter_client,[Server_PID]).  
+  
+Execution:
+7> Natashas-MacBook-Pro-2:counter natashamittal$ erl
+Erlang R15B03 (erts-5.9.3.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
+
+Eshell V5.9.3.1  (abort with ^G)
+1> c(counter_client_server).
+{ok,counter_client_server}
+2> counter_client_server:start().
+Server: <0.38.0> Client request received from: <0.39.0>
+<0.39.0>
+Client: <0.39.0> HitCount was: 1
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 2
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 3
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 4
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 5
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 6
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 7
+.
+.
+.
+Client: <0.39.0> HitCount was: 99
+Server: <0.38.0> Client request received from: <0.39.0>
+Client: <0.39.0> HitCount was: 100
+ok
+```
+
+When 'N' clients are spawn, following changes are made to the code above:
+
+```
+spawn_n_clients(N,Server_Address) ->
+  if
+    N > 0 ->
+      spawn(counter_client_server,counter_client,[Server_Address]),
+      timer:sleep(random:uniform(100)),
+      spawn_n_clients(N-1,Server_Address);
+    N == 0 ->
+      io:format("Last client spawned.~n")
+  end.
+
+start(Num) ->
+  Server_PID = spawn(counter_client_server,counter_server,[0]),
+  spawn_n_clients(Num,Server_PID).
+  
+Execution
+8> c(counter_client_server).
+{ok,counter_client_server}
+9> counter_client_server:start(10).
+Server: <0.72.0> Client request received from: <0.73.0>
+Client: <0.73.0> HitCount was: 1
+Server: <0.72.0> Client request received from: <0.74.0>
+Client: <0.74.0> HitCount was: 2
+Server: <0.72.0> Client request received from: <0.75.0>
+Client: <0.75.0> HitCount was: 3
+Server: <0.72.0> Client request received from: <0.76.0>
+Client: <0.76.0> HitCount was: 4
+Server: <0.72.0> Client request received from: <0.77.0>
+Client: <0.77.0> HitCount was: 5
+Server: <0.72.0> Client request received from: <0.78.0>
+Client: <0.78.0> HitCount was: 6
+Server: <0.72.0> Client request received from: <0.79.0>
+Client: <0.79.0> HitCount was: 7
+Server: <0.72.0> Client request received from: <0.80.0>
+Client: <0.80.0> HitCount was: 8
+Server: <0.72.0> Client request received from: <0.81.0>
+Client: <0.81.0> HitCount was: 9
+Server: <0.72.0> Client request received from: <0.82.0>
+Client: <0.82.0> HitCount was: 10
+Last client spawned.
+ok
+```
+
+### Fault-tolerance
+
+The linking of the processes is done via *link()* or *spawn_link()* functions. The example discussed below has been taken from [learnyousomeerlang](https://learnyousomeerlang.com/errors-and-processes) which clearly explains how linking works in Erlang.
+
+```
+-module(linking).
+-export([chain/1]).
+
+chain(0) ->
+  receive
+    _ -> ok
+  after 2000 ->
+    exit("chain dies here")
+  end;
+
+chain(N) ->
+  Pid = spawn(fun() -> chain(N-1) end),
+  link(Pid),
+  receive
+    _ -> ok
+  end.
+
+Execution:
+Eshell V6.4.1.7  (abort with ^G)
+1> link(spawn(linking, chain, [3])).
+true
+2> 2> 2> ** exception error: "chain dies here"
+
+Explanation:
+[erl shell] == [N=3] == [N=2] == [N=1] == [N=0]
+[erl shell] == [N=3] == [N=2] == [N=1] == *dead*
+[erl shell] == [N=3] == [N=2] == *dead*
+[erl shell] == [N=3] == *dead*
+[erl shell] == *dead*
+*dead, error message shown*
+[erl shell] <-- restarted       %% here erl also dies eventually.
+```
+
+
+
