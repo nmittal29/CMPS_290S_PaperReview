@@ -220,6 +220,88 @@ Explanation:
 *dead, error message shown*
 [erl shell] <-- restarted       %% here erl also dies eventually.
 ```
+### Client-Server: TCP Connection
 
+The code below explains how client-server interaction is done in Erlang using TCP connection:
+
+```
+-module(socket_server).
+-author("natashamittal").
+-export([start_server/0]).
+
+-define(PORT, 9000).
+
+start_server() ->
+  Pid = spawn_link(fun() ->
+    {ok, ListeningSocket} = gen_tcp:listen(?PORT,[binary, {active, true}]),
+    spawn(fun() -> acceptSocket(ListeningSocket) end),
+    timer:sleep(infinity)
+    end),
+  {ok, Pid}.
+
+acceptSocket(ListeningSocket) ->
+  {ok, AcceptSocket} = gen_tcp:accept(ListeningSocket),
+  spawn(fun() -> acceptSocket(ListeningSocket) end),
+  handler(AcceptSocket).
+
+handler(AcceptSocket) ->
+  %%inet:setopts(AcceptSocket,{active,once}),
+  receive
+    {tcp, AcceptSocket, <<"quit">>} -> gen_tcp:close(AcceptSocket);
+    {tcp, AcceptSocket, BinaryMessage} ->
+      if
+        (BinaryMessage =:= <<"Hi, How are you?">>) ->
+        gen_tcp:send(AcceptSocket, "I am fine :)");
+
+        (BinaryMessage =:= <<"What doing?">>) ->
+          gen_tcp:send(AcceptSocket, "Working!!");
+
+        (BinaryMessage =:= <<"Ok! Bye">>) ->
+          gen_tcp:send(AcceptSocket, "Bye :)");
+
+        true ->
+          gen_tcp:send(AcceptSocket, "Cannot interpret")
+      end,
+    handler(AcceptSocket)
+  end.
+  
+Execution:
+Erlang R15B03 (erts-5.9.3.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
+Eshell V5.9.3.1  (abort with ^G)
+1> c(socket_server).      %% server is started in one terminal
+{ok,socket_server}
+2> socket_server:start_server().
+{ok,<0.38.0>}
+
+Erlang R15B03 (erts-5.9.3.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
+Eshell V5.9.3.1  (abort with ^G)
+1> {ok, Socket} = gen_tcp:connect({127,0,0,1},9000,[binary,{active,true}]).  %% client is started in another terminal
+{ok,#Port<0.590>}
+2> gen_tcp:send(Socket,"Hi, How are you?").
+ok
+3> flush().
+Shell got {tcp,#Port<0.590>,<<"I am fine :)">>}
+ok
+4> gen_tcp:send(Socket,"What doing?").     
+ok
+5> flush().
+Shell got {tcp,#Port<0.590>,<<"Working!!">>}
+ok
+6> gen_tcp:send(Socket,"Ok! Bye").    
+ok
+7> flush().
+Shell got {tcp,#Port<0.590>,<<"Bye :)">>}
+ok
+8> gen_tcp:send(Socket,";) :)").  
+ok
+9> flush().                     
+Shell got {tcp,#Port<0.590>,<<"Cannot interpret">>}
+ok
+10> gen_tcp:send(Socket,"quit"). 
+ok
+11> flush().                    
+Shell got {tcp_closed,#Port<0.590>}
+ok
+```
 
 
