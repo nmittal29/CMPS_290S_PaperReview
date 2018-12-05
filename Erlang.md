@@ -109,7 +109,6 @@ start() ->
 Execution:
 7> Natashas-MacBook-Pro-2:counter natashamittal$ erl
 Erlang R15B03 (erts-5.9.3.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
-
 Eshell V5.9.3.1  (abort with ^G)
 1> c(counter_client_server).
 {ok,counter_client_server}
@@ -125,10 +124,6 @@ Server: <0.38.0> Client request received from: <0.39.0>
 Client: <0.39.0> HitCount was: 4
 Server: <0.38.0> Client request received from: <0.39.0>
 Client: <0.39.0> HitCount was: 5
-Server: <0.38.0> Client request received from: <0.39.0>
-Client: <0.39.0> HitCount was: 6
-Server: <0.38.0> Client request received from: <0.39.0>
-Client: <0.39.0> HitCount was: 7
 .
 .
 .
@@ -158,7 +153,7 @@ start(Num) ->
 Execution
 8> c(counter_client_server).
 {ok,counter_client_server}
-9> counter_client_server:start(10).
+9> counter_client_server:start(5).
 Server: <0.72.0> Client request received from: <0.73.0>
 Client: <0.73.0> HitCount was: 1
 Server: <0.72.0> Client request received from: <0.74.0>
@@ -169,16 +164,6 @@ Server: <0.72.0> Client request received from: <0.76.0>
 Client: <0.76.0> HitCount was: 4
 Server: <0.72.0> Client request received from: <0.77.0>
 Client: <0.77.0> HitCount was: 5
-Server: <0.72.0> Client request received from: <0.78.0>
-Client: <0.78.0> HitCount was: 6
-Server: <0.72.0> Client request received from: <0.79.0>
-Client: <0.79.0> HitCount was: 7
-Server: <0.72.0> Client request received from: <0.80.0>
-Client: <0.80.0> HitCount was: 8
-Server: <0.72.0> Client request received from: <0.81.0>
-Client: <0.81.0> HitCount was: 9
-Server: <0.72.0> Client request received from: <0.82.0>
-Client: <0.82.0> HitCount was: 10
 Last client spawned.
 ok
 ```
@@ -266,42 +251,30 @@ handler(AcceptSocket) ->
   end.
   
 Execution:
-Erlang R15B03 (erts-5.9.3.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
 Eshell V5.9.3.1  (abort with ^G)
 1> c(socket_server).      %% server is started in one terminal
 {ok,socket_server}
 2> socket_server:start_server().
 {ok,<0.38.0>}
 
-Erlang R15B03 (erts-5.9.3.1) [source] [64-bit] [smp:8:8] [async-threads:0] [hipe] [kernel-poll:false]
 Eshell V5.9.3.1  (abort with ^G)
 1> {ok, Socket} = gen_tcp:connect({127,0,0,1},9000,[binary,{active,true}]).  %% client is started in another terminal
 {ok,#Port<0.590>}
 2> gen_tcp:send(Socket,"Hi, How are you?").
-ok
 3> flush().
 Shell got {tcp,#Port<0.590>,<<"I am fine :)">>}
-ok
 4> gen_tcp:send(Socket,"What doing?").     
-ok
 5> flush().
 Shell got {tcp,#Port<0.590>,<<"Working!!">>}
-ok
 6> gen_tcp:send(Socket,"Ok! Bye").    
-ok
 7> flush().
 Shell got {tcp,#Port<0.590>,<<"Bye :)">>}
-ok
 8> gen_tcp:send(Socket,";) :)").  
-ok
 9> flush().                     
 Shell got {tcp,#Port<0.590>,<<"Cannot interpret">>}
-ok
 10> gen_tcp:send(Socket,"quit"). 
-ok
 11> flush().                    
 Shell got {tcp_closed,#Port<0.590>}
-ok
 ```
 
 
