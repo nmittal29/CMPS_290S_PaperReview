@@ -276,5 +276,223 @@ Shell got {tcp,#Port<0.590>,<<"Cannot interpret">>}
 11> flush().                    
 Shell got {tcp_closed,#Port<0.590>}
 ```
+### Mnesia
 
+Mnesia is the distributed database written in Erlang. The code below explains how mnesia can be used for distributed environment.
 
+Main Database Logic:
+
+```
+-module(db_logic).
+-author("natashamittal").
+-export([initDB/0, storeDB/2, getDBMsg/1, getDBMsgAndTime/1, deleteDB/1]).
+
+-include_lib("stdlib/include/qlc.hrl").
+
+-record(conversation,{nodeName,message,createdOn}).
+
+initDB() ->
+  mnesia:create_schema([node()]),
+  mnesia:start(),
+  mnesia:create_table(conversation, [{attributes, record_info(fields,conversation)},
+    {type, bag},
+    {disc_copies,[node()]}]).
+
+storeDB(NodeName, Message) ->
+  Fun = fun() ->
+        {CreatedOn,_} = calendar:universal_time(),
+        mnesia:write(#conversation{nodeName = NodeName, message = Message, createdOn = CreatedOn})
+        end,
+  mnesia:transaction(Fun).
+
+getDBMsg(NodeName) ->
+  Fun = fun() ->
+    Query = qlc:q([X || X <- mnesia:table(conversation),
+      X#conversation.nodeName =:= NodeName]),
+    Results = qlc:e(Query),
+    lists:map(fun(Item) -> Item#conversation.message end, Results)
+    end,
+  {atomic,Message} = mnesia:transaction(Fun),
+  Message.
+
+getDBMsgAndTime(NodeName) ->
+  Fun = fun() ->
+    Query = qlc:q([X || X <- mnesia:table(conversation),
+      X#conversation.nodeName =:= NodeName]),
+    Results = qlc:e(Query),
+    lists:map(fun(Item) -> {Item#conversation.message, Item#conversation.createdOn} end, Results)
+        end,
+  {atomic,Message} = mnesia:transaction(Fun),
+  Message.
+
+deleteDB(NodeName) ->
+  Fun = fun() ->
+    Query = qlc:q([X || X <- mnesia:table(conversation),
+      X#conversation.nodeName =:= NodeName]),
+    Results = qlc:e(Query),
+    F = fun() ->
+      list:foreach(fun(Result) ->
+                    mnesia:delete(Result)
+                   end,Results)
+        end,
+    mnesia:transaction(F)
+    end,
+
+  mnesia:transaction(Fun).
+```
+
+Database Server:
+
+```
+-module(database_server).
+-author("natashamittal").
+-behaviour(gen_server).
+-export([start_link/0]).
+-export([init/1,handle_call/3,handle_cast/2,handle_info/2,terminate/2,code_change/3]).
+-export([store/2, getDBMsg/1, getDBMsgAndTime/1, delete/1]).
+-record(state, {}).
+
+start_link() ->
+  gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+store(NodeName, Message) ->
+  gen_server:call({global,?MODULE},{store,NodeName,Message}).
+
+getDBMsg(NodeName) ->
+  gen_server:call({global,?MODULE},{getDBMsg,NodeName}).
+
+getDBMsgAndTime(NodeName) ->
+  gen_server:call({global,?MODULE},{getDBMsgAndTime,NodeName}).
+
+delete(NodeName) ->
+  gen_server:call({global,?MODULE},{delete,NodeName}).
+
+init(_Args) ->
+  process_flag(trap_exit, true),
+  io:format("~p (~p) starting .... ~n",[{global,?MODULE},self()]),
+  db_logic:initDB(),
+  {ok, #state{}}.
+
+handle_call({store, NodeName, Message}, _From, State) ->
+  db_logic:storeDB(NodeName,Message),
+  io:format("Message has been saved for ~p~n",[NodeName]),
+  {reply, ok, State};
+
+handle_call({getDBMsg, NodeName}, _From, State) ->
+  Messages = db_logic:getDBMsg(NodeName),
+  lists:foreach(fun(M) ->
+    io:format("Received: ~p~n",[M])
+    end,Messages),
+  {reply, ok, State};
+
+handle_call({getDBMsgAndTime, NodeName}, _From, State) ->
+  Messages = db_logic:getDBMsgAndTime(NodeName),
+  lists:foreach(fun({M, CO}) ->
+    io:format("Received: ~p Created on: ~p~n",[M,CO])
+                end,Messages),
+  {reply, ok, State};
+
+handle_call({delete,NodeName}, _From, State) ->
+  db_logic:deleteDB(NodeName),
+  io:format("Data deleted for ~p~n",[NodeName]),
+  {reply, ok, State};
+
+handle_call(_Request, _From, State) ->
+  {reply, ok, State}.
+
+handle_cast(_Request, State) ->
+  {noreply, State}.
+
+handle_info(_Info, State) ->
+  {noreply, State}.
+
+terminate(_Reason, _State) ->
+  ok.
+
+code_change(_OldVsn, State, _Extra) ->
+  {ok, State}.
+```
+
+Database Supervisor:
+
+```
+-module(database_supervisor).
+-author("natashamittal").
+-behaviour(supervisor).
+-export([start_link/0]).
+-export([init/1]).
+
+start_link() ->
+  supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+
+init(_) ->
+  RestartStrategy = one_for_one,
+  MaxRestarts = 3,
+  MaxSecondsBetweenRestarts = 30,
+
+  SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
+
+  Restart = permanent,
+  Shutdown = infinity,
+  Type = worker,
+
+  MnesiaSpecifications = {mnesiaServerId, {database_server, start_link(), []}, Restart, Shutdown, Type, [database_server]},
+
+  {ok, {SupFlags, [MnesiaSpecifications]}}.
+```
+
+Database Client:
+
+```
+-module(database_client).
+-author("natashamittal").
+-export([storeMessage/2,getMessage/1,getMessageAndTimestamp/1,deleteMessage/1]).
+
+storeMessage(NodeName, Message) ->
+  database_server:store(NodeName,Message).
+
+getMessage(NodeName) ->
+  database_server:getDBMsg(NodeName).
+
+getMessageAndTimestamp(NodeName) ->
+  database_server:getDBMsgAndTime(NodeName).
+
+deleteMessage(NodeName) ->
+  database_server:delete(NodeName).
+```
+
+Now, let's look at the execution:
+
+```
+Eshell V6.4.1.7  (abort with ^G)
+1> application:which_applications().
+[{stdlib,"ERTS  CXC 138 10","2.4"}, 
+ {kernel,"ERTS  CXC 138 10","3.2.0.1"}]
+2> database_application:start().
+{global,database_supervisor} <0.37.0> starting...
+{global,database_server} <0.38.0> starting....
+{global,database_client} <0.39.0> starting.....
+ok
+3> application:which_applications().
+[{database_application,"Database for storing and deleting Node Messages"},
+ {mnesia,"MNESIA  CXC 138 12","4.8"},
+ {stdlib,"ERTS  CXC 138 10","2.4"},
+ {kernel,"ERTS  CXC 138 10","3.2.0.1"}]
+ 4> database_client:storeMessage(node(),"Hi, How are you?").
+ Comment has been saved for nonode@nohost.
+ ok
+ 5> database_client:storeMessage(node(),"What are you doing?").
+ Comment has been saved for nonode@nohost.
+ ok
+ 6> database_client:getMessage(node()).
+ Received: "Hi, How are you?"
+ Received: "What are you doing?"
+ ok
+ 7> database_client:getMessageAndTimestamp(node()).
+ Received: "Hi, How are you?" Created on: {2018,12,5}
+ Received: "What are you doing?" Created on: {2018,12,5}
+ ok
+ 8> database_client:deleteMessage(node()).
+ Data deleted for: nonode@nohost
+ ok
+```
